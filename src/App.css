@@ -22,24 +22,27 @@
     display: inline-block !important;
     float: none !important;
 }
+.goal{
+
+
+      width: 100%;
+
+}
 
 form {
-    margin: auto;
 
    text-align: center;
-   padding: 10px;
-}
-label {
 
-    display: block;
 }
+
+
+
 .scroll {
     overflow-y: auto;
     height: 100px;
 }
 
 .frame {
-
     overflow-y: auto;
     height: 600px;
 }
@@ -51,8 +54,20 @@ button {
     font-size: 25px;
 
 }
+
+/* .modal{
+    background-color: rgba(255, 255, 255, 0.8);
+
+} */
 button:hover{
-    background-color: #4CAF50;
+    background-color: #8a2200;
+}
+.box{
+      width: 400px;
+      border: 15px  solid #8b0000;
+      padding: 25px;
+      margin: 25px;
+      display: block;
 }
 
 .grid-container {
@@ -61,12 +76,24 @@ button:hover{
   background-color: #D2691E;
   padding: 10px;
 }
+.close{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
 .grid-item {
   background-color: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 0, 0, 0.8);
   padding: 20px;
   font-size: 30px;
   text-align: center;
+}
+.grid-item:hover {
+    background-color: 	#8a2200;
+
+}
+.title{
+    text-align: center;
 }
 
 .App-title {

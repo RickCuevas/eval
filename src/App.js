@@ -21,8 +21,8 @@ const customStyles = {
     right                 : 'auto',
     bottom                : 'auto',
     marginRight           : '-50%',
-    transform             : 'translate(-50%, -50%)'
-
+    transform             : 'translate(-50%, -50%)',
+    backgroundColor       : '#ffe0cc'
   }
 };
 
@@ -38,17 +38,18 @@ class App extends Component {
             employees: [],
             evaluation: null,
             currentEmployee:'',
+            goals: ['','','']
 
         };
         this.grid = this.grid.bind(this);
         this.openModal = this.openModal.bind(this);
-        this.afterOpenModal = this.afterOpenModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.sendDate = this.sendData.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.evalForm = this.evalForm.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.sendData = this.sendData.bind(this);
+        this.addGoal = this.addGoal.bind(this);
     }
 
 
@@ -65,10 +66,7 @@ class App extends Component {
           });
   }
 
-  afterOpenModal() {
-    // references are now sync'd and can be accessed.
-    this.subtitle.style.color = '#f00';
-  }
+
 
   closeModal() {
     this.setState({modalIsOpen: false});
@@ -88,15 +86,25 @@ class App extends Component {
          </div>)
     }
 
+    addGoal(event){
+        event.preventDefault()
+        const goals = this.state.goals
+        goals.push('')
+        this.setState({[goals]: goals})
+    }
+
     sendData(event){
+        const payload = this.state.evaluation
+        payload[goals] = this.state.goals
         event.preventDefault()
         console.log(this.state.evalId)
         axios({
           method: 'post',
           url: `http://localhost:3000/update?id=${this.state.evalId}`,
-          data: this.state.evaluation
+          data: payload
       }).then(  (response) => {
            console.log(response)
+           this.closeModal()
        }).catch( (error) => {
             console.log(error);
       });
@@ -104,6 +112,8 @@ class App extends Component {
     }
 
     evalForm(){
+        console.log('rerendering')
+        console.log(this.state.goals)
         if (!this.state.evaluation){
             return (<p>placeHoler</p>)
         }
@@ -113,41 +123,33 @@ class App extends Component {
 
             for (const id in this.state.evaluation) {
 
-
-
                 evalForm.push((
-
-                    <label className="scroll">
-                        <label>
-                            {this.state.evaluation[id].question}
-                        </label>
-                        <div className="rating-wrap">
-                            <ReactStars
-                            key={id}
-                            name="rating"
-                            count={5}
-                            value={this.state.evaluation[id].rating || 0}
-                            onChange={(event) => this.handleChange("rating", id, event)}
-                            size={30}
-                            color2={'#ffd700'} />
+                            <div className="box">
+                                {this.state.evaluation[id].question}
+                                <div className="rating-wrap">
+                                    <ReactStars
+                                    key={id}
+                                    name="rating"
+                                    count={5}
+                                    value={this.state.evaluation[id].rating || 0}
+                                    onChange={(event) => this.handleChange("rating", id, event)}
+                                    size={30}
+                                    color2={'#ffd700'} />
+                                </div>
+                            <textarea name="comment" key={id} value={this.state.evaluation[id].comment} placeholder="Comments?"  onChange={(event) => this.handleChange("comment",id, event)} />
                         </div>
-                        <label>
-                             <textarea name="comment" key={id} value={this.state.evaluation[id].comment} placeholder="Comments?"  onChange={(event) => this.handleChange("comment",id, event)} />
-                        </label>
-
-                        {/*<label>
-                            <select type="text"  value={this.state.value} key={key} name="name" onChange={this.handleChange} >
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </label> */}
-                    </label>
+                ))
+            }
+            const times = (this.state.goals.length)
+            for(let i=0; i < times; i++){
+                console.log('i')
+                console.log(i)
+                evalForm.push((
+                    <textarea className="goal" name="goal" key={i}  value={this.state.goals[i]} placeholder="Goooooooooal!"  onChange={(event) => this.handleChange("goal", i, event)} />
 
                 ))
             }
+
             return evalForm
 
         }
@@ -156,11 +158,11 @@ class App extends Component {
 
 
     handleChange(type, id, value) {
-        console.log('type', type)
-        console.log( 'id',id)
-        console.log('value', value)
+        console.log('handle id')
+        console.log(id)
 
         const evaluation = this.state.evaluation
+        const goals = this.state.goals
 
         if (type === "rating") {
 
@@ -169,10 +171,20 @@ class App extends Component {
             console.log(this.state.evaluation)
 
         }
-        else {
+        else if (type === "comment") {
             evaluation[id]['comment'] = value.target.value
             this.setState({[evaluation]: evaluation})
             console.log(this.state.evaluation)
+
+        }
+        else if (type === "goal"){
+            console.log('goals')
+            console.log(goals)
+
+            goals[id] = (value.target.value)
+            this.setState([goals]: goals)
+            // console.log('this.gols')
+            // console.log(this.state.goals)
 
         }
 
@@ -217,12 +229,14 @@ class App extends Component {
           style={customStyles}
           contentLabel="Example Modal"
         >
-            <h2 ref={subtitle => this.subtitle = subtitle}>Eval for {this.state.currentEmployee}</h2>
-              <button onClick={this.closeModal}>close</button>
+
+            <h2 className="title">Eval for {this.state.currentEmployee}</h2>
+              <button className="close" onClick={this.closeModal}>🍔</button>
 
 
             <form className="frame">
                 {this.evalForm()}
+                <button onClick={this.addGoal}> +1 Goal!</button>
                 <button onClick={this.sendData}>Submit</button>
             </form>
 
